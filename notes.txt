@@ -1,0 +1,47 @@
+"Implode/Explode" PKZIP method 6
+"Deflate/Inflate" PKZIP method 8 (DEFLATE)
+"Reduce/Unreduce" ???
+"Shrink/Unshrink" Dynamic LZW
+
+https://users.cs.jmu.edu/buchhofp/forensics/formats/pkzip.html
+https://github.com/kornelski/7z/blob/20e38032e62bd6bb3a176d51bce0558b16dd51e2/CPP/7zip/Archive/Zip/ZipIn.cpp#L332
+
+An Explanation of the Deflate Algorithm (1997)
+http://www.zlib.org/feldspar.html
+
+A Technique for High-Performance Data Compression (1984)
+https://www2.cs.duke.edu/courses/spring03/cps296.5/papers/welch_1984_technique_for.pdf
+
+The Data Compression Book 2nd Ed (1995)
+https://pdfs.semanticscholar.org/6a25/d08e1697dcd97e8f86ffdfe7cf0e23b0f7f1.pdf
+
+A Technique for High Ratio LZW Compression (2003)
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.3.4564&rep=rep1&type=pdf
+https://marknelson.us/posts/2011/11/08/lzw-revisited.html
+
+Size Adaptive Region Based Huffman Compression Technique (2014)
+https://arxiv.org/ftp/arxiv/papers/1403/1403.0153.pdf
+
+Fast Computation of Huffman Codes (2016)
+https://software.intel.com/en-us/articles/fast-computation-of-huffman-codes
+
+minizip
+https://github.com/madler/zlib/tree/master/contrib/minizip
+
+Coding: Huffman, Arithmetic
+Modeling: Statistical, Dictionary
+
+-----------------------------------------------------------------------------
+DEFLATE Compressed Data Format Specification version 1.3 (1996)
+https://www.ietf.org/rfc/rfc1951.txt
+
+Series of arbitrary blocks
+Max size of uncompressable block is 64K
+Each block has two Huffman trees and some compressed data
+LZ77 can reference strings up to 32K backward in input stream
+Compressed data is series of elements, either: literal bytes or pointers to
+backreference <length, backward distance> (max len 258, max dist 32K)
+Tree 1: literals and lengths
+Tree 2: distances
+
+-----------------------------------------------------------------------------

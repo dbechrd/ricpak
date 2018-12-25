@@ -18,6 +18,20 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\common.c" />
+    <ClCompile Include="src\file_stream.c" />
+    <ClCompile Include="src\pak.c" />
+    <ClCompile Include="src\ricpak.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\common.h" />
+    <ClInclude Include="src\file_stream.h" />
+    <ClInclude Include="src\pak.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="notes.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{A900E0FA-569E-413F-8218-A3BDFA455386}</ProjectGuid>
@@ -121,16 +135,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="src\file_stream.c" />
-    <ClCompile Include="src\ricpak.c">
-      <FileType>CppCode</FileType>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="common.h" />
-    <ClInclude Include="file_stream.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

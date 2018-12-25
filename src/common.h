@@ -13,3 +13,9 @@ typedef unsigned int u32;
 #define DIE(msg, ...) printf(msg, __VA_ARGS__); getc(stdin); exit(1)
 #define TWICE(stmt) (stmt), (stmt)
 #define READ(dest, hnd) fread(&(dest), sizeof((dest)), 1, hnd)
+
+#define TO_BASE_N (sizeof(unsigned)*CHAR_BIT + 1)
+#define TO_BASE(x, b, pad) to_base((char [TO_BASE_N]){""}, (x), (b), (pad))
+#define DEFLATE_MAX_CODE_LEN 15
+
+char *to_base(char *buf, unsigned i, int base, int pad);
