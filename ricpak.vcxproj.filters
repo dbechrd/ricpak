@@ -18,5 +18,16 @@
     <ClCompile Include="src\ricpak.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\file_stream.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="file_stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
