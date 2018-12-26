@@ -5,11 +5,15 @@
     <ClCompile Include="src\file_stream.c" />
     <ClCompile Include="src\ricpak.c" />
     <ClCompile Include="src\pak.c" />
+    <ClCompile Include="src\memory_stream.c" />
+    <ClCompile Include="src\bit_stream.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\file_stream.h" />
     <ClInclude Include="src\pak.h" />
+    <ClInclude Include="src\memory_stream.h" />
+    <ClInclude Include="src\bit_stream.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="notes.txt" />
