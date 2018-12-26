@@ -1,7 +1,7 @@
 #include "common.h"
 #include "bit_stream.h"
 #include "memory_stream.h"
-#include "pak.h"
+#include "pak_file.h"
 
 void test_bit_read() {
     //file_stream stream = { 0 };
@@ -26,6 +26,7 @@ void test_bit_read() {
             byte = (byte << 1) | bit;
         }
         printf("\n%02x\n", byte);
+        assert(byte == buf[i]);
     }
 
     for (int i = 0; i < 4; i++) {
@@ -152,18 +153,28 @@ void test_pak_file() {
 
             // Read local header
             fseek(pak.stream.hnd, hdr->local_hdr_offset, SEEK_SET);
-            pak_local_hdr local_hdr = { 0 };
-            fread(&local_hdr, LOCAL_HDR_SIZE, 1, pak.stream.hnd);
-            fseek(pak.stream.hnd, local_hdr.filename_len, SEEK_CUR);
-            fseek(pak.stream.hnd, local_hdr.extra_field_len, SEEK_CUR);
+            pak_local_hdr *local_hdr = calloc(1, LOCAL_HDR_SIZE);
+            fread(local_hdr, LOCAL_HDR_SIZE, 1, pak.stream.hnd);
 
-            // Seems like a useful sanity check..
-            assert(hdr->uncompressed_size == local_hdr.uncompressed_size);
+            // Realloc and read variable-length fields
+            u32 new_size = LOCAL_HDR_SIZE + local_hdr->filename_len + local_hdr->extra_field_len;
+            realloc(local_hdr, new_size);
+            local_hdr->filename = local_hdr + LOCAL_HDR_SIZE;
+            local_hdr->extra_field = local_hdr->filename + local_hdr->filename_len;
+            fread(local_hdr->filename, local_hdr->filename_len, 1, pak.stream.hnd);
+            fread(local_hdr->extra_field, local_hdr->extra_field_len, 1, pak.stream.hnd);
+
+            // TODO: Check flags bit 3 to determine if CRC is in a post-buffer data descriptor
+            // TODO: Actually calculate the checksum of the file data
+            assert(local_hdr->crc32);
+
+            // DEBUG: Random local vs. cdir header sanity check
+            assert(hdr->crc32 == local_hdr->crc32);
 
             // Read file contents
-            u8 *out = calloc(1, local_hdr.uncompressed_size);
+            u8 *out = calloc(1, local_hdr->uncompressed_size);
             u8 *out_ptr = out;
-            u32 len = local_hdr.uncompressed_size;
+            u32 len = local_hdr->uncompressed_size;
             while (len) {
                 if (!bs_read_byte(out_ptr, &pak.stream.bs)) {
                     printf("Failed to read byte\n");

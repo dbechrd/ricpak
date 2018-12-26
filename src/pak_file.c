@@ -1,4 +1,4 @@
-#include "pak.h"
+#include "pak_file.h"
 
 const char *compression_str(u16 compression) {
     switch (compression) {
