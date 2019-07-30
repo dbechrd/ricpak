@@ -147,7 +147,7 @@ void test_pak_file() {
 
     pak_cdir_hdr *hdr = pak.cdir_hdrs;
     while (hdr) {
-        printf("> cat %.*s\n", hdr->filename_len, hdr->filename);
+        printf("%.*s:\n", hdr->filename_len, hdr->filename);
         if (hdr->compression == PAK_CDIR_COMPRESSED_NONE) {
             assert(hdr->compressed_size == hdr->uncompressed_size);
 
