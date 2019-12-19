@@ -1,6 +1,7 @@
 #include "file_stream.h"
 
-int fs_open(file_stream *stream, const char *filename) {
+int fs_open(file_stream *stream, const char *filename)
+{
     assert(!stream->hnd);
     stream->bs.type = BS_FILE;
     stream->filename = filename;
@@ -14,8 +15,9 @@ int fs_open(file_stream *stream, const char *filename) {
     return 1;
 }
 
-void fs_close(file_stream *stream) {
-    if (stream->hnd) {
+void fs_close(file_stream *stream)
+{
+    if (!stream->hnd) {
         return;
     }
     fclose(stream->hnd);
@@ -24,9 +26,10 @@ void fs_close(file_stream *stream) {
     memset(stream, 0, sizeof(*stream));
 }
 
-int fs_next_byte(file_stream *stream) {
+int fs_next_byte(file_stream *stream)
+{
     assert(stream->hnd);
-    if (!READ(stream->bs.byte, stream->hnd)) {
+    if (!fread(&stream->bs.byte, sizeof(stream->bs.byte), 1, stream->hnd)) {
         assert(feof(stream->hnd));  // If not EOF, something broke
         return 0;
     }

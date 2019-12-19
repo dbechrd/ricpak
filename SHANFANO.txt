@@ -1,0 +1,353 @@
+Highly technical exchange of messsages between Bob Freed and Phil Katz, from
+July 8, 1989 to July 20, 1989.
+
+
+=========================================================================
+Date: 07-08-89 (17:55) Number: 1093 Channel 1 Communicatio
+To: BOB FREED Refer#: NONE
+From: PHIL KATZ Read: NO
+Subj: ANSI in ZIP-COMMENTS Conf: (49) PKware
+------------------------------------------------------------------------
+Bob,
+
+>> (Out of curiosity: Why Shannon-Fano code? I would think
+>> you could do Huffman faster. I'm waiting anxiously for
+>> some technical details.)
+
+Quite the opposite! Shannon-Fano decoding (if done properly) is MUCh
+faster than Huffman decoding, due to certain characteristics that can
+be taken advantage of in a Shannon-Fano tree. Also, Shannon-Fano trees
+can be compressed for storage smaller than a similar Huffman tree. To
+wit, PKZIP 1.0 will store up to 3 Shannon-Fano trees for each file. Two
+of the trees have 64 values each, and the 3rd one 256 values. Yet, I
+can store all three of these trees in approximately 120 bytes! (SCRNCH
+used Shannon-Fano trees too, by the way). The first two trees take
+about 25 bytes, and the 3rd one about 97 bytes.
+
+Also, even though PKZIP 1.0 uses static Shannon-Fano trees, future
+versions of PKZIP could calculate dynamic (i.e. two-pass, not to be
+confused with adaptive) Shannon-Fano trees and store them with the file
+as 1.0 does, and PKUNZIP 1.0 will be able to extract these files.
+Furthermore, the Shannon-Fano tree construction algorithm takes much
+less memory than a Huffman construction, is the same runtime order as
+Huffman, but is much simpler and therefore somewhat faster too.
+
+Most importantly though, Shannon-Fano encoding in some cases provides
+better compression than Huffman encoding, and the output from a sliding
+dictionary compressor seems to be one of these cases.
+
+
+=========================================================================
+Date: 07-09-89 (14:55) Number: 1101 Channel 1 Communicatio
+To: PHIL KATZ Refer#: 1093
+From: BOB FREED Read: YES
+Subj: ANSI in ZIP-COMMENTS Conf: (49) PKware
+------------------------------------------------------------------------
+Phil,
+
+>> Quite the opposite! Shannon-Fano decoding [...]
+
+Great! Now I know how to get a fast response out of you. Just get
+technical. I don't blame you, either. This is much more interesting
+than "When's the next release?" or "Down with S*A!" (At least to some of
+us. ;-))
+
+>> [...] (if done properly) is MUCh faster than Huffman
+>> decoding, due to certain characteristics that can be
+>> taken advantage of in a Shannon-Fano tree.
+
+Hmmm, I'll have to wait to see your official technical description to
+be convinced. I thought the primary differnce was in ENcoding.
+(Shannon- Fano being essentially a "top-down" construction algorithm, as
+opposed to "bottom-up" with Huffman code.) Before you decide about the
+speed of DEcoding static tries, you might want to familiarize yourself
+with the work of Steven Greenberg in a CP/M program called USQFST.
+
+>> Also, Shannon-Fano trees can be compressed for storage
+>> smaller than a similar Huffman tree. [...] (SCRNCH
+>> used Shannon-Fano trees too, by the way).
+
+I've examined the scheme employed by the SCRNCH decompressor, and it's
+indistinguishable (to me) from a Huffman trie decoder.
+
+>> Most importantly though, Shannon-Fano encoding in some
+>> cases provides better compression than Huffman encoding
+>> and the output from a sliding dictionary compressor seems
+>> to be one of these cases.
+
+Theoretically, Shannon-Fano should not exceed Huffman compression.
+Again, I'm anxiously awaiting specific details of the PKZIP 1.0
+implementation. Now that you're into Beta test, I assume we won't have
+long to wait for the technical description.
+
+
+=========================================================================
+Date: 07-15-89 (21:26) Number: 1214 Channel 1 Communicatio
+To: BOB FREED Refer#: NONE
+From: PHIL KATZ Read: NO
+Subj: ANSI in ZIP-COMMENTS Conf: (49) PKware
+------------------------------------------------------------------------
+
+>> Great! Now I know how to get a fast response out
+>> of you. Just get technical. I don't blame you,
+>> either. This is much more interesting than "When's
+>> the next release?" or "Down with S*A!" (At least
+>> to some of us. ;-))
+
+Amen!
+
+>> Before you decide about the speed of DEcoding static
+>> tries, you might want to familiarize yourself with
+>> the work of Steven Greenberg in a CP/M program called
+>> USQFST.
+
+I am familiar with the decoding algorithm used in USQFST, it is
+essentially the same algorithm used in ALUSQ and in PKXARC for Squeezed
+files. The only drawback of this fast-lookup method (when used with
+Huffman tries) is that codes longer than 8 bits still must be decoded
+using the Greenlaw algorithm.
+
+With Shannon-Fano tries PKUNZIP can decode any Shannon-Fano code up to
+16 bits in length (or theoretically longer codes if I used them) without
+ever reverting to the Greenlaw algorithm, and in about the same amount
+of memory needed for Huffman decoding. If you look at Bob Tolz's
+Compress 8 benchmarks in every case except one, with PKUNZIP 1.0 Alpha,
+Exploding of files (un-Imploding) is faster than every other program!
+
+>>>> Also, Shannon-Fano trees can be compressed for
+>>>> storage smaller than a similar Huffman tree.
+>>>> [...] (SCRNCH used Shannon-Fano trees too, by
+>>>> the way).
+
+>> I've examined the scheme employed by the SCRNCH
+>> decompressor, and it's indistinguishable (to me)
+>> from a Huffman trie decoder.
+
+Well, I have the complete source code to SCRNCH, along with over 100+
+pages of notes directly from Graeme. After implementing the
+Shannon-Fano codes in PKZIP 1.0, I said to myself "I think I've seen
+this somewhere before..." Re-reading Graeme's notes do indeed show that
+he uses a top-down Shannon-Fano construction process, and takes
+advantage of the Shannon-Fano code characterstics to store a compressed
+table, although somewhat differently than I am. I don't think that
+Graeme is using the fast-lookup decoding scheme though, at least not the
+same way I am doing it.
+
+A conventionally created Huffman tree can not be stored compressed using
+either the method Graeme uses or the method that I use. A Huffman tree
+can be transformed though into a 'Shannon-Fano equivalent', and then
+stored compressed. The general principle required for the
+transformation is "For any given node in the tree, the depth of the X
+branch is >= the depth of the Y branch". Where X is arbitrarily left or
+right, and Y is the opposite of X. The Shannon-Fano construction
+process guarantees this characteristic. The Huffman process does not,
+but a Huffman tree can be transformed to have this characterstic.
+
+
+>>>> Most importantly though, Shannon-Fano encoding in
+>>>> some cases provides better compression than Huffman
+>>>> encoding, and the output from a sliding dictionary
+>>>> compressor seems to be one of these cases.
+
+>> Theoretically, Shannon-Fano should not exceed Huffman
+>> compression.
+
+This is false. There is nothing magical about Huffman encoding. In
+Held's "Data Compression, Techniques and Applications", he gives
+specific examples that for certain symbol frequencies Huffman encoding
+yields better compression than Shannon-Fano, but for other frequencies
+Shannon-Fano does indeed yield better compression than Huffman. Held
+concludes his evaluation of Shannon-Fano vs. Huffman by saying:
+
+"In general, as the probabilities of each character in the
+character set approach probabilities that are negative powers of
+2 both codes will have their average code length approach
+entropy. ... If the probabilities of occurrence of the elements
+in a set have a large variance, the Shannon-Fano code will be
+more efficient while the Huffman code becomes more efficient as
+the variance in probabilities decreases between elements in the
+set."
+
+Both Shannon-Fano and Huffman constructions are merely step-wise integer
+approximations to the true entropy of the symbols. Only arithmetic
+encoding can truely portray the entropy of the symbols being
+represented. In general, both Shannon-Fano and Huffman are special
+cases of the general class of methods to create optimally weighted
+binary search trees. Other construction methods such as Hu-Tucker
+(Knuth, "Art of Computer Programming", Vol. 3) might be more efficient
+than either Huffman or Shannon-Fano depending on the symbol frequencies
+involved.
+
+
+=======================================================================================
+Date: 07-18-89 (12:26) Number: 1234 Channel 1 Communicatio
+To: PHIL KATZ Refer#: 1214
+From: BOB FREED Read: YES
+Subj: ANSI in ZIP-COMMENTS Conf: (49) PKware
+------------------------------------------------------------------------
+
+>> I am familiar with the decoding algorithm used in USQFST,
+>> it is essentially the same algorithm used in ALUSQ and in
+>> PKXARC for Squeezed files. The only drawback of this fast-
+>> lookup method (when used with Huffman tries) is that codes
+>> longer than 8 bits still must be decoded using the Greenlaw
+>> algorithm.
+
+I'm not sure we're talking about the same technique. I've never seen
+the source of ALUSQ. I gather not many outside of the legal community
+have had the privilege of viewing PKXARC source. 🙂 However, the Z80
+assembler code of USQFST has always been available publicly.
+
+The USQFST method "unfolds" the binary decoding trie into machine code
+at runtime. The resulting code performs ultrafast trie traversal. Steve
+Greenberg's program was particularly efficient, because he took
+advantage of some very bit-intensive Z80 instructions in the code
+nodes. (I believe similar speed is possible with the 80?86 instruction
+sets.)
+
+Also, I'm not sure what you mean by the "Greenlaw algorithm," but
+USQFST employs nothing that resembles Richard Greenlaw's original USQ.C
+code or any of its numerous derivative implementations. There is no
+limitation on code length, which is a function of trie depth. In fact,
+although Greenlaw's encoding algorithm restricted output codes to 16
+bits, I had once written an experimental SQ replacement for the Z80 that
+allowed unlimited code lengths (40 bits, actually), and USQFST had no
+trouble decoding the output of that program.
+
+>> If you look at Bob Tolz's Compress 8 benchmarks, in every
+>> case except one, with PKUNZIP 1.0 Alpha, Exploding of files
+>> (un-Imploding) is faster than every other program!
+
+I'm not disagreeing that your Shannon-Fano implementation facilitates
+especially efficient decoding, but I suspect that PKUNZIP's performance
+is more a tribute to your programming skill than any inherent
+algorithmic advantage. (How's that for a convoluted compliment?)
+
+>> [various comparisons between Shannon-Fano and Huffman
+>> algorithms]
+
+We may be quibbling over semantics here. I think the bottom line is
+that both algorithms generate the identical type of data structure (a
+binary trie). It is the construction (encoding) algorithm which
+differs. I take it you are emphasizing the manner in which the trie is
+balanced as a characteristic of the Shannon-Fano method. However, that
+may simply be a characteristic of your particular implementation.
+(Similarly for Graeme McRae's implementation in SCRNCH.)
+
+My understanding is that both the Huffman and Shannon-Fano algorithms
+involve arbitrary choices and that neither algorithm guarantees a
+unique result. I.e., for a given set of inputs, either algorithm can
+produce many different output tries which satisfy its criteria for
+optimal weighted path length. (The Hu-Tucker algorithm, which you
+mentioned, is simply a more restrictive case of the general Huffman
+method.)
+
+I can't disagree that either algorithm may be more efficient for
+*specific* input sets. (As we both know and have stated publicly many
+times: For any two given compression methods, one can always find a file
+which compresses better with one than the other.) My comments about
+*theoretic* performance were directed toward the "average" case. Since
+you quoted to me from Held, I will quote to you from Storer ("Data
+Compression: Methods and Theory"):
+
+"There are other coding techniques which, like Huffman coding,
+are perfect in the information theoretic sense." [arithmetic
+coding]
+
+"Shannon-Fano codes are not perfect in the information
+theoretic sense, but can be shown to always be close."
+
+Of course, by "perfect," Storer means that the compression approaches
+entropy when applied to an infinite-length source stream with
+independent symbol probabilities. The compression techniques employed
+by PC archiving software are improving, but they have a long way to go
+to achieve entropy in the general case. 🙂 So, why don't we call it a
+toss-up between Huffman and Shannon-Fano for purposes of encoding the
+output of a sliding dictionary compressor? Any speed advantages
+resulting from output representation are necessarily implementation-
+dependent. Hence, I await your application notes for Exploding.
+
+
+=======================================================================================
+Date: 07-20-89 (13:02) Number: 1265 Channel 1 Communicatio
+To: PHIL KATZ Refer#: NONE
+From: BOB FREED Read: YES
+Subj: Shannon-Fano vs. Huffman Conf: (49) PKware
+------------------------------------------------------------------------
+
+I've now seen the APPNOTE.TXT file which accompanies PKZIP 1.0 Beta. Now
+that I understand the Imploding (well, at least, the Exploding)
+algorithm and data representation, I'd like to pursue a few points from
+your earlier comparisons of Shannon-Fano and Huffman coding.
+
+>> Shannon-Fano trees can be compressed for storage
+>> smaller than a similar Huffman tree.
+
+>> A conventionally created Huffman tree can not be stored
+>> compressed using either the method Graeme uses or the
+>> method that I use. A Huffman tree can be transformed
+>> though into a 'Shannon-Fano equivalent', and then stored
+>> compressed.
+
+More precisely, a Huffman tree with maximum external path length of 16
+bits or less can be transformed into an equivalent tree which can be
+compressed for storage using the method of PKZIP 1.0. By "equivalent,"
+I mean having identical weighted path length.
+
+Note that the exact tree shape or code bit strings generated by the
+Huffman algorithm are unimportant; all that matters (for optimal data
+compression) is the resulting code string lengths. Thus, a Huffman tree
+can be *trivially* transformed into what you refer to as a "Shannon-Fano
+equivalent," by preparing the list of Huffman code lengths for each
+source symbol and then following the tree construction algorithm you
+supply in APPNOTE.TXT. (That is why I assumed that SCRNCH uses a
+Huffman algorithm, although I understand now that such trees result
+naturally from Shannon-Fano encoding.)
+
+>> Most importantly though, Shannon-Fano encoding in
+>> some cases provides better compression than Huffman
+>> encoding, and the output from a sliding dictionary
+>> compressor seems to be one of these cases.
+
+>>>> Theoretically, Shannon-Fano should not exceed
+>>>> Huffman compression.
+
+>> This is false. There is nothing magical about Huffman
+>> encoding. In Held's "Data Compression, Techniques and
+>> Applications", he gives specific examples [...]
+
+I stand by my statement. The only thing magical about the Huffman
+algorithm (if done properly) is that it always generates an optimal
+decoding tree, i.e. one with minimal weighted path length. The
+Shannon-Fano algorithm does not necessarily do so. The difference may
+not be worth worrying about, but when there is a difference, it will
+always favor Huffman. (However, I don't have a copy of Held's book
+handy, so if his examples are correct, you can easily prove me wrong.
+:-))
+
+One other comment: A disadvantage of your method (like Greenlaw's
+Huffman implementation) is the 16-bit code length limit. You might have
+achieved slightly better compression in some files by allowing longer
+codes. This could have been accomodated by adding an extra byte at the
+start of each tree's data table to specify the maximum code length, n.
+Then each table byte would hold ceiling(log n) bits of length and
+floor(8-[log n]) bits of count, rather than the current fixed 4 and 4
+split.
+
+Question: Under what circumstances do you use a 4K sliding dictionary
+and/or 2 trees (as opposed to 8K and/or 3 trees)?
+
+
+=======================================================================================
+Date: 07-20-89 (17:08) Number: 1266 Channel 1 Communicatio
+To: PHIL KATZ Refer#: NONE
+From: BOB FREED Read: YES
+Subj: Shannon-Fano vs. Huffman Conf: (49) PKware
+------------------------------------------------------------------------
+
+I glanced at Held's "Data Compression" in a bookstore today. For what
+it's worth, his Huffman tree construction is *incorrect* (in the first
+example where he claims Shannon-Fano is superior). I'm glad I
+discovered that. Saved me from wasting $39.95 on that book.
+
+- end -

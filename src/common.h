@@ -10,9 +10,7 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 
 #define ARRAY_COUNT(a) (sizeof(a)/sizeof(a[0]))
-#define DIE(msg, ...) printf(msg, __VA_ARGS__); getc(stdin); exit(1)
-#define TWICE(stmt) (stmt), (stmt)
-#define READ(dest, hnd) fread(&(dest), sizeof((dest)), 1, hnd)
+#define DIE(msg, ...) printf(msg, __VA_ARGS__); (void)getchar(); exit(1)
 
 #define TO_BASE_N (sizeof(unsigned)*CHAR_BIT + 1)
 #define TO_BASE(x, b, pad) to_base((char [TO_BASE_N]){""}, (x), (b), (pad))

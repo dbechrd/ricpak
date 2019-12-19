@@ -2,7 +2,8 @@
 
 // Copyright - Some random person on StackOverflow.. this is mostly debug code
 // https://stackoverflow.com/a/34641674/770230
-char *to_base(char *buf, unsigned i, int base, int pad) {
+char *to_base(char *buf, unsigned i, int base, int pad)
+{
     assert(base >= 2 && base <= 36);
     assert(pad <= TO_BASE_N);
     char *s = &buf[TO_BASE_N - 1];
